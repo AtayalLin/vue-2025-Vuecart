@@ -11,5 +11,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  base: '/vue-2025-week01/', // 這裡設置為你的 GitHub 倉庫名稱
+  base: '/vue-2025-Vuecart/',
 })
