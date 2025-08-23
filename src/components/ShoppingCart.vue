@@ -21,6 +21,10 @@
           </button>
         </div>
       </li>
+      <li class="list-group-item d-flex justify-content-between">
+        <strong>總金額</strong>
+        <span class="fw-bold">${{ totalAmount }}</span>
+      </li>
     </ul>
   </div>
 </template>
@@ -29,6 +33,11 @@
 export default {
   props: {
     cart: Array,
+  },
+  computed: {
+    totalAmount() {
+      return this.cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    },
   },
   methods: {
     removeFromCart(productId) {

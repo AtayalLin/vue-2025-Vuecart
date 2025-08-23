@@ -7,7 +7,7 @@
       :data-aos="'flip-left'"
     >
       <div class="card h-100">
-        <img :src="product.image" class="card-img-top" />
+        <img :src="product.image" :alt="product.name" class="card-img-top" />
         <div class="card-body">
           <h5 class="card-title">{{ product.name }}</h5>
           <p class="card-text">{{ product.description }}</p>

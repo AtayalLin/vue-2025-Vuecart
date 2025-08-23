@@ -13,12 +13,8 @@
       </div>
     </div>
 
-    <!-- 通知元件 -->
-    <Notification
-      :message="message"
-      :isSuccess="isSuccess"
-      @close-notification="closeNotification"
-    />
+    <!-- 通知元件（改為使用 inject 取得資料） -->
+    <Notification />
   </div>
 </template>
 
@@ -27,6 +23,7 @@ import ProductList from './components/ProductList.vue'
 import ShoppingCart from './components/ShoppingCart.vue'
 import Notification from './components/Notification.vue'
 import AOS from 'aos'
+import { computed } from 'vue'
 
 export default {
   components: {
@@ -79,8 +76,7 @@ export default {
         },
       ],
       cart: [],
-      message: '',
-      isSuccess: true, // 默認為成功
+      messages: [],
     }
   },
   methods: {
@@ -91,30 +87,33 @@ export default {
       } else {
         this.cart.push({ ...product, quantity: 1 })
       }
-      this.isSuccess = true // 設為成功，顯示綠色背景
-      this.showNotification(`${product.name} 已加入購物車`)
+      this.enqueueMessage(`${product.name} 已加入購物車`, true)
     },
     removeFromCart(productId) {
       const index = this.cart.findIndex((item) => item.id === productId)
       if (index > -1) {
         this.cart.splice(index, 1)
-        this.isSuccess = false // 設為失敗，顯示紅色背景
-        this.showNotification('商品已從購物車移除')
+        this.enqueueMessage('商品已從購物車移除', false)
       }
     },
-    showNotification(message) {
-      this.message = message
+    enqueueMessage(text, isSuccess) {
+      // 以佇列方式新增訊息
+      this.messages.push({ text, isSuccess })
+      // 3 秒後移除最舊的一則（queue：shift）
       setTimeout(() => {
-        this.message = ''
+        if (this.messages.length > 0) this.messages.shift()
       }, 3000)
     },
-    closeNotification() {
-      this.message = ''
+    closeNotification(index) {
+      // 關閉指定 index 的訊息
+      if (index >= 0 && index < this.messages.length) this.messages.splice(index, 1)
     },
   },
   provide() {
+    // 提供反應式的訊息佇列與關閉函式給子元件注入
     return {
-      message: this.message,
+      messages: computed(() => this.messages),
+      closeNotification: this.closeNotification,
     }
   },
   mounted() {

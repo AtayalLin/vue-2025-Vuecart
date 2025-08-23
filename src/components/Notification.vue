@@ -1,21 +1,19 @@
 <template>
-  <div
-    v-if="message"
-    class="position-fixed top-0 end-0 p-3"
-    style="z-index: 1050"
-    :data-aos="'fade-up'"
-  >
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
     <div
-      class="toast show align-items-center text-white"
-      :class="{ 'bg-success': isSuccess, 'bg-danger': !isSuccess }"
+      v-for="(msg, idx) in injectedMessages"
+      :key="idx"
+      class="toast show align-items-center text-white mb-2"
+      :class="{ 'bg-success': msg.isSuccess, 'bg-danger': !msg.isSuccess }"
       style="border-radius: 5px"
+      :data-aos="'fade-up'"
     >
       <div class="d-flex">
-        <div class="toast-body">{{ message }}</div>
+        <div class="toast-body">{{ msg.text }}</div>
         <button
           type="button"
           class="btn-close btn-close-white me-2 m-auto"
-          @click="closeNotification"
+          @click="close(idx)"
         ></button>
       </div>
     </div>
@@ -23,15 +21,23 @@
 </template>
 
 <script>
+import { inject, computed } from 'vue'
+
 export default {
-  props: {
-    message: String,
-    isSuccess: Boolean, // 這是用來根據背景顏色來判斷是否成功
-  },
-  methods: {
-    closeNotification() {
-      this.$emit('close-notification')
-    },
+  setup() {
+    // 從父層注入訊息佇列與關閉方法
+    const injectedMessages = inject(
+      'messages',
+      computed(() => []),
+    )
+    const closeNotification = inject('closeNotification', () => {})
+
+    const close = (idx) => closeNotification(idx)
+
+    return {
+      injectedMessages,
+      close,
+    }
   },
 }
 </script>
